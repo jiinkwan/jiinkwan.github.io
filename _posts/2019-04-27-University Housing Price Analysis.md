@@ -1,7 +1,8 @@
-
 ---
 
-_You are currently looking at **version 1.1** of this notebook. To download notebooks and datafiles, as well as get help on Jupyter notebooks in the Coursera platform, visit the [Jupyter Notebook FAQ](https://www.coursera.org/learn/python-data-analysis/resources/0dhYG) course resource._
+title: "Housing Price Analysis in University Towns"
+date: 2019-04-27 08:26:28 -0400
+categories: 'Data Science'
 
 ---
 
@@ -12,8 +13,8 @@ import numpy as np
 from scipy.stats import ttest_ind
 ```
 
-# Assignment 4 - Hypothesis Testing
-This assignment requires more individual learning than previous assignments - you are encouraged to check out the [pandas documentation](http://pandas.pydata.org/pandas-docs/stable/) to find functions or methods you might not have used yet, or ask questions on [Stack Overflow](http://stackoverflow.com/) and tag them as pandas and python related. And of course, the discussion forums are open for interaction with your peers and the course staff.
+# Housing Price Analysis in University Towns
+It is a popular belief that housing price is affected less by recession in university towns than it is in non university towns. This is to demonstrate that whether the popular belief is true or false. 
 
 Definitions:
 * A _quarter_ is a specific three month period, Q1 is January through March, Q2 is April through June, Q3 is July through September, Q4 is October through December.
@@ -21,18 +22,19 @@ Definitions:
 * A _recession bottom_ is the quarter within a recession which had the lowest GDP.
 * A _university town_ is a city which has a high percentage of university students compared to the total population of the city.
 
-**Hypothesis**: University towns have their mean housing prices less effected by recessions. Run a t-test to compare the ratio of the mean price of houses in university towns the quarter before the recession starts compared to the recession bottom. (`price_ratio=quarter_before_recession/recession_bottom`)
+**Hypothesis**: University towns have their mean housing prices less effected by recessions. Run a t-test to compare the ratio of the mean price of houses in university towns the quarter before the recession starts compared to the recession bottom. 
+
+(`price_ratio=quarter_before_recession/recession_bottom`)
 
 The following data files are available for this assignment:
 * From the [Zillow research data site](http://www.zillow.com/research/data/) there is housing data for the United States. In particular the datafile for [all homes at a city level](http://files.zillowstatic.com/research/public/City/City_Zhvi_AllHomes.csv), ```City_Zhvi_AllHomes.csv```, has median home sale prices at a fine grained level.
 * From the Wikipedia page on college towns is a list of [university towns in the United States](https://en.wikipedia.org/wiki/List_of_college_towns#College_towns_in_the_United_States) which has been copy and pasted into the file ```university_towns.txt```.
 * From Bureau of Economic Analysis, US Department of Commerce, the [GDP over time](http://www.bea.gov/national/index.htm#gdp) of the United States in current dollars (use the chained value in 2009 dollars), in quarterly intervals, in the file ```gdplev.xls```. For this assignment, only look at GDP data from the first quarter of 2000 onward.
 
-Each function in this assignment below is worth 10%, with the exception of ```run_ttest()```, which is worth 50%.
+The following is the dictionary that maps full state names and two letter acronyms.  
 
 
 ```python
-# Use this dictionary to map state names to two letter acronyms
 states = {'OH': 'Ohio', 'KY': 'Kentucky', 'AS': 'American Samoa', 'NV': 'Nevada', 'WY': 'Wyoming', 'NA': 'National', 'AL': 'Alabama', 'MD': 'Maryland', 'AK': 'Alaska', 'UT': 'Utah', 'OR': 'Oregon', 'MT': 'Montana', 'IL': 'Illinois', 'TN': 'Tennessee', 'DC': 'District of Columbia', 'VT': 'Vermont', 'ID': 'Idaho', 'AR': 'Arkansas', 'ME': 'Maine', 'WA': 'Washington', 'HI': 'Hawaii', 'WI': 'Wisconsin', 'MI': 'Michigan', 'IN': 'Indiana', 'NJ': 'New Jersey', 'AZ': 'Arizona', 'GU': 'Guam', 'MS': 'Mississippi', 'PR': 'Puerto Rico', 'NC': 'North Carolina', 'TX': 'Texas', 'SD': 'South Dakota', 'MP': 'Northern Mariana Islands', 'IA': 'Iowa', 'MO': 'Missouri', 'CT': 'Connecticut', 'WV': 'West Virginia', 'SC': 'South Carolina', 'LA': 'Louisiana', 'KS': 'Kansas', 'NY': 'New York', 'NE': 'Nebraska', 'OK': 'Oklahoma', 'FL': 'Florida', 'CA': 'California', 'CO': 'Colorado', 'PA': 'Pennsylvania', 'DE': 'Delaware', 'NM': 'New Mexico', 'RI': 'Rhode Island', 'MN': 'Minnesota', 'VI': 'Virgin Islands', 'NH': 'New Hampshire', 'MA': 'Massachusetts', 'GA': 'Georgia', 'ND': 'North Dakota', 'VA': 'Virginia'}
 ```
 
@@ -41,7 +43,7 @@ states = {'OH': 'Ohio', 'KY': 'Kentucky', 'AS': 'American Samoa', 'NV': 'Nevada'
 pd.read_table('university_towns.txt')
 ```
 
-
+The following is the list of university towns collected from wikipedia. 
 
 
 <div>
@@ -53,11 +55,12 @@ pd.read_table('university_towns.txt')
     .dataframe tbody tr th {
         vertical-align: top;
     }
-
+    
     .dataframe thead th {
         text-align: right;
     }
 </style>
+
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -315,7 +318,7 @@ pd.read_table('university_towns.txt')
 <p>566 rows × 1 columns</p>
 </div>
 
-
+The following is a fucntion that creates the university town list. 
 
 
 ```python
@@ -331,6 +334,7 @@ def get_list_of_university_towns():
     2. For "RegionName", when applicable, removing every character from " (" to the end.
     3. Depending on how you read the data, you may need to remove newline character '\n'. '''
     
+    # Converting the dictionary into a data frame to make it easier to merge.
     states_df = pd.DataFrame.from_dict(states, orient = 'index')
     states_df.columns = ['State']
     states_df
@@ -343,11 +347,14 @@ def get_list_of_university_towns():
     university_town = university_town.fillna(method = 'ffill')
     university_town = university_town[~(university_town['RegionName'] == university_town['State'])]
     university_town['RegionName'] = university_town['RegionName'].apply(lambda x: x[:x.find('(')].strip())
-    university_town = university_town[['State','RegionName']]
     
     
-    return university_town.reset_index(drop = True)
+    return university_town
 ```
+
+
+
+The following is a function that finds out when the recession starts. We are currently looking at the years since 2000. To change the period, we can change where it's marked with comment.
 
 
 ```python
@@ -357,13 +364,8 @@ def get_recession_start():
     gdp = pd.read_excel('gdplev.xls',skiprows= 4, header = 1, index_col = 'Unnamed: 4')[
        'GDP in billions of chained 2009 dollars.1'].dropna()
     gdp = pd.DataFrame(gdp)
-    #gdp.reset_index(drop=True)
     gdp.columns = ['GDP']
-    #gdp.index.rename('Quarter')
-    #gdp[gdp['Quarter'] >= '2000q1']
-    #gdp
-    #gdp = gdp.iloc[214:].reset_index(drop=True)
-    gdp = gdp.loc['2000q1':]
+    gdp = gdp.loc['2000q1':] # change the values in the [ ] to modify the period.
     gdp['GDP Diff'] = gdp['GDP'].diff(1)
     gdp = gdp.reset_index()
     gdp.columns = ['Quarter', 'GDP', 'GDP Diff']    
@@ -383,7 +385,7 @@ get_recession_start()
 
     '2008q3'
 
-
+This function is basically the same as the above except it returns the quarter before the recession starts. It's modified at the end. 
 
 
 ```python
@@ -393,19 +395,14 @@ def get_quarter_before_recession_start():
     gdp = pd.read_excel('gdplev.xls',skiprows= 4, header = 1, index_col = 'Unnamed: 4')[
        'GDP in billions of chained 2009 dollars.1'].dropna()
     gdp = pd.DataFrame(gdp)
-    #gdp.reset_index(drop=True)
     gdp.columns = ['GDP']
-    #gdp.index.rename('Quarter')
-    #gdp[gdp['Quarter'] >= '2000q1']
-    #gdp
-    #gdp = gdp.iloc[214:].reset_index(drop=True)
-    gdp = gdp.loc['2000q1':]
+    gdp = gdp.loc['2000q1':] # change the values in the [ ] to modify the period.
     gdp['GDP Diff'] = gdp['GDP'].diff(1)
     gdp = gdp.reset_index()
     gdp.columns = ['Quarter', 'GDP', 'GDP Diff']    
     for i in range(1,len(gdp)):
         if (gdp.loc[i, 'GDP Diff'] < 0) & (gdp.loc[i+1, 'GDP Diff'] < 0):
-            return gdp.loc[i-1,'Quarter']
+            return gdp.loc[i-1,'Quarter'] # modfied to return a quarter before
     return None
 ```
 
@@ -419,7 +416,7 @@ get_quarter_before_recession_start()
 
     '2008q2'
 
-
+The following is a function that finds out when the recession ends. We are currently looking at the years since 2000. To change the period, we can change where it's marked with comment.
 
 
 ```python
@@ -429,13 +426,8 @@ def get_recession_end():
     gdp = pd.read_excel('gdplev.xls',skiprows= 4, header = 1, index_col = 'Unnamed: 4')[
        'GDP in billions of chained 2009 dollars.1'].dropna()
     gdp = pd.DataFrame(gdp)
-    #gdp.reset_index(drop=True)
     gdp.columns = ['GDP']
-    #gdp.index.rename('Quarter')
-    #gdp[gdp['Quarter'] >= '2000q1']
-    #gdp
-    #gdp = gdp.iloc[214:].reset_index(drop=True)
-    gdp = gdp.loc['2000q1':]
+    gdp = gdp.loc['2000q1':] # change the values in the [ ] to modify the period.
     gdp['GDP Diff'] = gdp['GDP'].diff(1)
     gdp = gdp.reset_index()
     gdp.columns = ['Quarter', 'GDP', 'GDP Diff'] 
@@ -457,7 +449,7 @@ get_recession_end()
 
     '2009q4'
 
-
+The following is a function that finds out when the recession is at its peak. We are currently looking at the years since 2000. To change the period, we can change where it's marked with comment.
 
 
 ```python
@@ -468,13 +460,8 @@ def get_recession_bottom():
     gdp = pd.read_excel('gdplev.xls',skiprows= 4, header = 1, index_col = 'Unnamed: 4')[
        'GDP in billions of chained 2009 dollars.1'].dropna()
     gdp = pd.DataFrame(gdp)
-    #gdp.reset_index(drop=True)
     gdp.columns = ['GDP']
-    #gdp.index.rename('Quarter')
-    #gdp[gdp['Quarter'] >= '2000q1']
-    #gdp
-    #gdp = gdp.iloc[214:].reset_index(drop=True)
-    gdp = gdp.loc['2000q1':]
+    gdp = gdp.loc['2000q1':] # change the values in the [ ] to modify the period.
     gdp['GDP Diff'] = gdp['GDP'].diff(1)
     gdp = gdp.reset_index()
     gdp.columns = ['Quarter', 'GDP', 'GDP Diff'] 
@@ -493,7 +480,7 @@ get_recession_bottom()
 
     '2009q2'
 
-
+The orifinal talbe have the values by months. We are only interested in quarterly data. This function convert the data to quarterly data. 
 
 
 ```python
@@ -525,11 +512,12 @@ def convert_housing_data_to_quarters():
         housingPriceQuarter[str(year) + quarters[2]] = housingPriceQuarter[YMs[6:9]].mean(axis = 1)
         housingPriceQuarter[str(year) + quarters[3]] = housingPriceQuarter[YMs[9:12]].mean(axis = 1)
     
-    #2016~
-    month2016 = ['2016-01','2016-02','2016-03','2016-04','2016-05','2016-06','2016-07','2016-08','2016-01']
+    #2016~ only have the data up to q3. With the above iteration it will return error. So it's handled separately.
+    month2016 = ['2016-01','2016-02','2016-03','2016-04','2016-05','2016-06','2016-07','2016-08']
     housingPriceQuarter[str(2016) + quarters[0]] = housingPriceQuarter[month2016[0:3]].mean(axis = 1)
     housingPriceQuarter[str(2016) + quarters[1]] = housingPriceQuarter[month2016[3:6]].mean(axis = 1)
     housingPriceQuarter[str(2016) + quarters[2]] = housingPriceQuarter[month2016[6:8]].mean(axis = 1)
+    # the following is the columns that we are interested in. 
     columns = ['State','RegionName','2000q1', '2000q2', '2000q3', '2000q4', '2001q1', '2001q2', '2001q3',
                '2001q4', '2002q1', '2002q2', '2002q3', '2002q4', '2003q1', '2003q2',
                '2003q3', '2003q4', '2004q1', '2004q2', '2004q3', '2004q4', '2005q1',
@@ -552,12 +540,12 @@ def convert_housing_data_to_quarters():
 convert_housing_data_to_quarters().shape
 ```
 
-
+It returns 10730 rows and 67 columns
 
 
     (10730, 67)
 
-
+Finally t-test. The hypothesis is that University towns have their mean housing prices less effected by recessions. The null hypothesis would be that University towns and non University towns are the same. 
 
 
 ```python
@@ -609,9 +597,4 @@ run_ttest()
 
     (True, 0.002724063704761164, 'university town')
 
-
-
-
-```python
-
-```
+It returned true, which means we can reject the null hypothesis. We can confidently say that University towns have more resistance to the housing price change during recessions at least during the last recession. However, we did not run the t-test on other period of times. It might not be true in different times. 
