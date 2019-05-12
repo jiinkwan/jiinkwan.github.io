@@ -711,7 +711,7 @@ tempRecordGraph(dataMergedPivot)
 
 
 
-<img src="./2019-05-12 Daily High and Lwo Temparature Comparison/Assignment2.png" width="640">
+<img src="./2019-05-12-Daily High and Low Temparature Comparison/Assignment2.png" width="640">
 
 
 
