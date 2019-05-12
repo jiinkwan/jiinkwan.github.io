@@ -711,10 +711,5 @@ tempRecordGraph(dataMergedPivot)
 
 
 
-![Record High / Low Temperature in 2005 - 2104 vs. 2015](./2019-05-12-Daily High and Low Temparature Comparison/Assignment2.png)
+![Record High / Low Temperature in 2005 - 2104 vs. 2015](https://user-images.githubusercontent.com/5780796/57582868-1d65ae00-7505-11e9-9ee8-e9bd4540c267.png)
 
-
-
-```python
-
-```
